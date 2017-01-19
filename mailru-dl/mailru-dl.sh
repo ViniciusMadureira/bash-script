@@ -93,6 +93,10 @@ durations=()
 text=""
 while [ true ]; do
 	htmlContent=$(curl -s --data "st=search&q=$1&sameFromAjax=1&offset=$offset" "$baseUrl" -H 'Accept-Language:en-US,en;q=0.8,pt;q=0.6')
+	if [[ $offset -eq 0 && -z "$htmlContent" ]]; then
+		echo -e "No video found to \"$1\"."
+		exit 0
+	fi
 	items=$(echo -e "$htmlContent" | grep -Poz "(?U)<li class=\"list-item \">.*<\/li>" | sed -e 's/\$/ /g' -e 's/\|#[0-9]\+//g')
 	IFS=$ read -r -a itemsTags <<< $(echo -e "$items" | sed 's/li>/li>$/g')
 	resetVideos "${itemsTags[@]}"
